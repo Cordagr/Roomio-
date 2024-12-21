@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile[7] }}'s Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .profile-picture {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .profile-picture img {
+            max-width: 150px;
+            border-radius: 50%;
+        }
+        .profile-details {
+            margin-top: 20px;
+        }
+        .flash-messages ul {
+            list-style: none;
+            padding: 0;
+        }
+        .flash-messages li {
+            background-color: #ffdddd;
+            color: #900;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 5px solid #900;
+        }
+        .friend-request-form {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .friend-request-form input,
+        .friend-request-form textarea,
+        .friend-request-form button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .friend-request-form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .friend-request-form button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ profile[7] }}'s Profile</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Profile Picture -->
+    <div class="profile-picture">
+        <img src="{{ profile[6] }}" alt="{{ profile[7] }}'s Profile Picture">
+    </div>
+
+    <!-- Profile Details -->
+    <div class="profile-details">
+        <p><strong>User ID:</strong> {{ profile[0] }}</p>
+        <p><strong>Allergies:</strong> {{ profile[1] }}</p>
+        <p><strong>Smoker:</strong> {{ profile[2] }}</p>
+        <p><strong>Chore Preferences:</strong> {{ profile[3] }}</p>
+        <p><strong>Cooking Frequency:</strong> {{ profile[4] }}</p>
+        <p><strong>Username:</strong> {{ profile[7] }}</p>
+    </div>
+
+    <!-- Friend Request Form -->
+    <div class="friend-request-form">
+        <h2>Send Friend Request</h2>
+        <form action="{{ url_for('userProfile.send_friend_request') }}" method="post">
+            <input type="hidden" name="receiver_username" value="{{ profile[7] }}">  <!-- This value is fetched from profile[7] -->
+            <label for="message">Message:</label>
+            <textarea name="message" id="message" rows="4" placeholder="Enter your message"></textarea>
+            <button type="submit">Send Friend Request</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Chat with {{ friend.username }}</h2>
+
+<div class="chat-box" id="chat-box">
+    {% for message in messages %}
+        <div class="message">
+            <strong>{{ message.sender }}:</strong>
+            <p>{{ message.content }}</p>
+            <small>{{ message.timestamp }}</small>
+        </div>
+    {% endfor %}
+</div>
+
+<form id="message-form">
+    <textarea name="message" id="message-input" placeholder="Type your message here..." required></textarea>
+    <button type="submit">Send</button>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+<script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var friendId = {{ friend.id }};
+    var userId = {{ current_user.id }};
+    
+    // Join the chat room for this conversation
+    socket.emit('join', friendId);
+
+    // Listen for new messages
+    socket.on('new_message', function(data) {
+        if (data.receiver_id == userId) {
+            var messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = '<strong>' + data.sender + ':</strong> ' + data.content + 
+                '<p>' + data.timestamp + '</p>';
+            document.getElementById('chat-box').appendChild(messageElement);
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+        }
+    });
+
+    // Send a message
+    document.getElementById('message-form').onsubmit = function(event) {
+        event.preventDefault();
+        var messageContent = document.getElementById('message-input').value;
+        if (messageContent) {
+            fetch('/messages/{{ friend.id }}', {
+                method: 'POST',
+                body: new URLSearchParams({ 'message': messageContent }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }).then(response => response.text()).then(data => {
+                document.getElementById('message-input').value = ''; // Clear input
+            });
+        }
+    };
+</script>
+{% endblock %}

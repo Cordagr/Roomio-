@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert Property</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaNxj0-YpZIl43BnBGb7yY-Ljq82SNJsE&libraries=places" defer></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 2em;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        button {
+            background-color: #000000;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #000000;
+        }
+
+        a {
+            color: #000000;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 15px;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #000000;
+        }
+
+        .multi-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .multi-select label {
+            display: flex;
+            align-items: center;
+        }
+
+        .multi-select input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Add New Property</h1>
+    <form method="POST" action="{{ url_for('property.insertProperty') }}" id="property-form">
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required placeholder="Start typing your address...">
+        <input type="hidden" id="valid-address" name="valid_address" value="false">
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea>
+
+        <label for="rent_price">Rent Price:</label>
+        <input type="number" id="rent_price" name="rent_price" min="400" placeholder="$0.00" required>
+
+        <label for="utilities">Utilities:</label>
+        <div id="utilities" class="multi-select">
+            <label><input type="checkbox" name="utilities" value="Electricity"> Electricity</label>
+            <label><input type="checkbox" name="utilities" value="Water"> Water</label>
+            <label><input type="checkbox" name="utilities" value="Gas"> Gas</label>
+            <label><input type="checkbox" name="utilities" value="Internet"> Internet</label>
+            <label><input type="checkbox" name="utilities" value="Cable"> Cable</label>
+            <label><input type="checkbox" name="utilities" value="Trash"> Trash</label>
+            <label><input type="checkbox" name="utilities" value="Sewage"> Sewage</label>
+            <label><input type="checkbox" name="utilities" value="Heating"> Heating</label>
+            <label><input type="checkbox" name="utilities" value="Cooling"> Cooling</label>
+            <label><input type="checkbox" name="utilities" value="Parking"> Parking</label>
+            <label><input type="checkbox" name="utilities" value="HOA"> HOA</label>
+            <label><input type="checkbox" name="utilities" value="Other"> Other</label>
+        </div>
+
+        <label for="pets">Pets Allowed:</label>
+        <div id="pets" class="multi-select">
+            <label><input type="checkbox" name="pets" value="Dog"> Dog</label>
+            <label><input type="checkbox" name="pets" value="Cat"> Cat</label>
+            <label><input type="checkbox" name="pets" value="Bird"> Bird</label>
+            <label><input type="checkbox" name="pets" value="Fish"> Fish</label>
+            <label><input type="checkbox" name="pets" value="Rabbit"> Rabbit</label>
+            <label><input type="checkbox" name="pets" value="Hamster"> Hamster</label>
+            <label><input type="checkbox" name="pets" value="Guinea Pig"> Guinea Pig</label>
+            <label><input type="checkbox" name="pets" value="Turtle"> Turtle</label>
+            <label><input type="checkbox" name="pets" value="Snake"> Snake</label>
+            <label><input type="checkbox" name="pets" value="Lizard"> Lizard</label>
+            <label><input type="checkbox" name="pets" value="Frog"> Frog</label>
+            <label><input type="checkbox" name="pets" value="Horse"> Horse</label>
+            <label><input type="checkbox" name="pets" value="Chicken"> Chicken</label>
+            <label><input type="checkbox" name="pets" value="Goat"> Goat</label>
+            <label><input type="checkbox" name="pets" value="Other"> Other</label>
+        </div>
+
+        <button type="submit">Add Property</button>
+    </form>
+    <a href="/displayAllProperties">View All Properties</a>
+
+    <script>
+    function initializeAutocomplete() {
+        const addressInput = document.getElementById('address');
+        const validAddress = document.getElementById('valid-address');
+
+        if (!google || !google.maps || !google.maps.places) {
+            console.error("Google Maps Places library is not loaded.");
+            return;
+        }
+
+        const autocomplete = new google.maps.places.Autocomplete(addressInput);
+        autocomplete.setFields(['address_components', 'geometry', 'formatted_address']);
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                alert('No details available for input: ' + (place.name || 'unknown location'));
+                validAddress.value = 'false';
+                return;
+            }
+            addressInput.value = place.formatted_address;
+            validAddress.value = 'true'; // Mark the address as valid
+        });
+
+        console.log("Autocomplete initialized.");
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error("Google Maps API failed to load.");
+        } else {
+            initializeAutocomplete();
+        }
+
+        // Prevent form submission without a valid address
+        const form = document.getElementById('property-form');
+        form.addEventListener('submit', (event) => {
+            const validAddress = document.getElementById('valid-address');
+            if (validAddress.value !== 'true') {
+                alert("Please select a valid address from the autocomplete suggestions.");
+                event.preventDefault(); // Stop form submission
+            }
+
+            // If no utilities are selected, set the value to 'none'
+            const utilitiesChecked = Array.from(document.querySelectorAll('input[name="utilities"]:checked'));
+            if (utilitiesChecked.length === 0) {
+                alert("Please select at least one utility.");
+                event.preventDefault(); // Stop form submission
+            }
+
+            // If no pets are selected, set the value to 'none'
+            const petsChecked = Array.from(document.querySelectorAll('input[name="pets"]:checked'));
+            if (petsChecked.length === 0) {
+                document.querySelector('input[name="pets"]').value = 'none';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

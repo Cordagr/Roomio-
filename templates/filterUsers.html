@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Users</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0056b3;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        form div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .result-item strong {
+            color: #000000;
+        }
+
+        .btn-view-profile {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #000000;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .btn-view-profile:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-home {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #000000;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .btn-home:hover {
+            background-color: #000000;
+        }
+
+        hr {
+            margin-top: 30px;
+            border: 0;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Flash Messages */
+        ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        li {
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Filter Users</h1>
+
+    <!-- Link to Home -->
+    <a href="{{ url_for('home') }}" class="btn-home">Go to Home</a>
+
+    <!-- Filter Form -->
+    <form method="POST" action="{{ url_for('userProfile.filters_users') }}">
+        {{ form.hidden_tag() }}
+        <h3>Filter Criteria</h3>
+        <fieldset>
+            <div>
+                {{ form.allergies.label }} {{ form.allergies }}
+            </div>
+            <div>
+                {{ form.smoker.label }} {{ form.smoker }}
+            </div>
+            <div>
+                {{ form.chore_preferences.label }} {{ form.chore_preferences }}
+            </div>
+            <div>
+                {{ form.cooking.label }} {{ form.cooking }}
+            </div>
+            <div>
+                {{ form.owned_pets.label }} {{ form.owned_pets }}
+            </div>
+        </fieldset>
+        <div>
+            <button type="submit" name="submit_button" value="apply_filters" class="btn-view-profile">Apply Filters</button>
+        </div>
+        <div>
+            <button type="submit" name="submit_button" value="apply_exclusion_filters" class="btn-view-profile">Apply Filters (Exclusion)</button>
+        </div>
+    </form>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <hr>
+
+    <!-- Display Results -->
+    {% if filtered_users %}
+        <h2>Filtered Results:</h2>
+        <ul>
+            {% for user in filtered_users %}
+                <li class="result-item">
+                    <strong>Allergies:</strong> {{ user.allergies|default('None') }}<br>
+                    <strong>Smoker:</strong> {{ user.smoker|default('No') }}<br>
+                    <strong>Chore Preferences:</strong> {{ user.chore_preferences|default('Not specified') }}<br>
+                    <strong>Cooking:</strong> {{ user.cooking|default('Not specified') }}<br>
+                    <strong>Owned Pets:</strong> {{ user.owned_pets|default('None') }}<br>
+                    <strong>Username:</strong> {{ user.username|default('Anonymous') }}
+
+                    <!-- View Profile Link -->
+                    <a href="{{ url_for('userProfile.show_other_profile', username=user.username) }}" class="btn-view-profile">View Profile</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No users found matching your filters.</p>
+    {% endif %}
+</body>
+</html>

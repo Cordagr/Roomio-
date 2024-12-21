@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #000;
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #000;
+            padding: 5px 10px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>User Profile</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('userProfile.show_user_profile') }}">Go to Profile</a></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Current Profile Information</h2>
+        <p><strong>Allergies:</strong> {{ profile['allergies'] if profile['allergies'] else 'Not set' }}</p>
+        <p><strong>Smoker:</strong> {{ profile['smoker'] if profile['smoker'] else 'Not set' }}</p>
+        <p><strong>Chore Preferences:</strong> {{ profile['chore_preferences'] if profile['chore_preferences'] else 'Not set' }}</p>
+        <p><strong>Cooking Frequency:</strong> {{ profile['cooking'] if profile['cooking'] else 'Not set' }}</p>
+        <p><strong>Owned Pets:</strong> {{ profile['owned_pets'] if profile['owned_pets'] else 'Not set' }}</p>
+        <p><strong>Profile Picture:</strong> 
+            {% if profile['profile_picture'] %}
+                <img src="{{ url_for('static', filename='profile_pictures/' + profile['profile_picture']) }}" alt="Profile Picture">
+            {% else %}
+                No profile picture uploaded.
+            {% endif %}
+        </p>
+    </section>
+
+    <section>
+        <h2>Edit Profile</h2>
+        <form action="{{ url_for('userProfile.editUserProfile') }}" method="POST">
+            <label for="allergies">Allergies</label>
+            <input type="text" id="allergies" name="allergies" value="{{ profile['allergies'] or '' }}">
+
+            <label for="smoker">Smoker</label>
+            <select id="smoker" name="smoker">
+                <option value="yes" {% if profile['smoker'] == 'yes' %}selected{% endif %}>Yes</option>
+                <option value="no" {% if profile['smoker'] == 'no' %}selected{% endif %}>No</option>
+            </select>
+
+            <label for="chore_preferences">Chore Preferences</label>
+            <input type="text" id="chore_preferences" name="chore_preferences" value="{{ profile['chore_preferences'] or '' }}">
+
+            <label for="cooking">Cooking Frequency</label>
+            <select id="cooking" name="cooking">
+                <option value="daily" {% if profile['cooking'] == 'daily' %}selected{% endif %}>Daily</option>
+                <option value="weekly" {% if profile['cooking'] == 'weekly' %}selected{% endif %}>Weekly</option>
+                <option value="rarely" {% if profile['cooking'] == 'rarely' %}selected{% endif %}>Rarely</option>
+                <option value="never" {% if profile['cooking'] == 'never' %}selected{% endif %}>Never</option>
+            </select>
+
+            <label for="owned_pets">Owned Pets</label>
+            <input type="text" id="owned_pets" name="owned_pets" value="{{ profile['owned_pets'] or '' }}">
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </section>
+
+    <footer>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings</title>
+    <style>
+        /* Style the switch */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .label-text {
+            margin-right: 10px; /* Space between label text and switch */
+            font-weight: bold;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        /* Navigation links styling */
+        .nav-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #1e88e5;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #bbdefb;
+        }
+
+        /* Back to Home button styling */
+        .back-home {
+    </style>
+</head>
+<body>
+    <h1>User Settings</h1>
+
+    <!-- Back to Home link -->
+    <a href="{{ url_for('home') }}" class="back-home">Back to Home</a>
+
+    <form method="POST">
+        <h3>Notifications</h3>
+
+        <div class="setting-item">
+            <span class="label-text">In-App Notifications:</span>
+            <label class="switch">
+                <input type="checkbox" name="in_app_notifications"
+                       onchange="this.form.action='{{ url_for('settings.toggle_in_app_notifications') }}'; this.form.submit();" 
+                       {% if settings['in_app_notifications'] == 'enabled' %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <span class="label-text">Out-of-App Notifications:</span>
+            <label class="switch">
+                <input type="checkbox" name="out_of_app_notifications"
+                       onchange="this.form.action='{{ url_for('settings.toggle_out_of_app_notifications') }}'; this.form.submit();" 
+                       {% if settings['out_of_app_notifications'] == 'enabled' %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <h3>Profile</h3>
+
+        <div class="setting-item">
+            <span class="label-text">Profile Visibility:</span>
+            <label class="switch">
+                <input type="checkbox" name="profile_visibility"
+                       onchange="this.form.action='{{ url_for('settings.toggle_profile_visibility') }}'; this.form.submit();" 
+                       {% if settings['profile_visibility'] == 'enabled' %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </form>
+</body>
+</html>

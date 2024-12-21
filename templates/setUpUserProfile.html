@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Up Profile</title>
+</head>
+<body>
+    <h1>Set Up Your Profile</h1>
+    <!-- The unique_url is dynamically inserted into the action URL -->
+    <form method="POST" action="{{ url_for('userProfile.setUpUserProfile') }}">
+        <div>
+            <label for="allergies">Allergies:</label>
+            <textarea id="allergies" name="allergies"></textarea>
+        </div>
+        <div>
+            <label for="smoker">Smoker:</label>
+            <input type="checkbox" id="smoker" name="smoker">
+        </div>
+        <div>
+            <label for="chore_preferences">Chore Preferences:</label>
+            <textarea id="chore_preferences" name="chore_preferences"></textarea>
+        </div>
+        <div>
+            <label for="cooking">Cooking Frequency:</label>
+            <input type="text" id="cooking" name="cooking">
+        </div>
+        <div>
+            <label for="owned_pets">Owned Pets:</label>
+            <textarea id="owned_pets" name="owned_pets"></textarea>
+        </div>
+        <button type="submit">Save Profile</button>
+    </form>
+</body>
+</html>

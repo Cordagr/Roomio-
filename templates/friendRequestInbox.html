@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friend Request Inbox</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .request-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .request-message {
+            font-style: italic;
+            color: #555;
+        }
+
+        .request-info {
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .status {
+            font-weight: bold;
+            color: #4CAF50;  /* Green for active requests */
+        }
+
+        .status.rejected {
+            color: #f44336;  /* Red for rejected requests */
+        }
+
+        .buttons {
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            margin-right: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-accept {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-reject {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Friend Request Inbox</h1>
+    <div id="inbox">
+        <ul id="request-list">
+            <!-- Initial friend requests will be displayed here -->
+            {% for request in requests %}
+                <li class="request-item" id="request-{{ request.id }}">
+                    <div class="request-message">
+                        <strong>Message:</strong> {{ request.message or "No message" }}
+                    </div>
+                    <div class="request-info">
+                        <span class="status {{ 'rejected' if request.status == 'rejected' else '' }}">{{ request.status }}</span> |
+                        <span>Sent on: {{ request.created_at }}</span>
+                    </div>
+
+                    {% if request.status == 'pending' %}
+                    <div class="buttons">
+                        <form action="{{ url_for('userProfile.accept_friend_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                            <button type="submit" class="btn btn-accept">Accept</button>
+                        </form>
+                        <form action="{{ url_for('userProfile.reject_friend_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                            <button type="submit" class="btn btn-reject">Reject</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        // Track the last request ID seen
+        let lastRequestId = {% if requests %}{{ requests[-1].id }}{% else %}0{% endif %};
+
+        // Fetch friend requests and update the inbox
+        function fetchFriendRequests() {
+            $.ajax({
+                url: "/friendRequestInbox",  // Ensure the URL is correct
+                method: "GET",
+                success: function(data) {
+                    // Check if the response is valid
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+
+                    // Check if new requests exist
+                    data.requests.forEach(request => {
+                        // Only add requests that have an ID greater than the last seen request ID
+                        if (request.id > lastRequestId) {
+                            const statusClass = request.status === 'pending' ? 'pending' : (request.status === 'accepted' ? 'accepted' : (request.status === 'rejected' ? 'rejected' : ''));
+                            $("#request-list").prepend(`
+                                <li class="request-item" id="request-${request.id}">
+                                    <div class="request-message">
+                                        <strong>Message:</strong> ${request.message || "No message"}
+                                    </div>
+                                    <div class="request-info">
+                                        <span class="status ${statusClass}">${request.status}</span> |
+                                        <span>Sent on: ${request.created_at}</span>
+                                    </div>
+                                    ${request.status === 'pending' ? `
+                                        <div class="buttons">
+                                            <form action="/friendRequests/acceptFriendRequest/${request.id}" method="POST" style="display:inline;">
+                                                <input type="hidden" name="request_id" value="${request.id}">
+                                                <button type="submit" class="btn btn-accept">Accept</button>
+                                            </form>
+                                            <form action="/friendRequests/rejectFriendRequest/${request.id}" method="POST" style="display:inline;">
+                                                <input type="hidden" name="request_id" value="${request.id}">
+                                                <button type="submit" class="btn btn-reject">Reject</button>
+                                            </form>
+                                        </div>` : ''
+                                    }
+                                </li>
+                            `);
+                            lastRequestId = request.id;  // Update the last seen request ID
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Failed to fetch friend requests:", error);
+                }
+            });
+        }
+
+        // Automatically fetch requests every 5 seconds
+        setInterval(fetchFriendRequests, 5000);
+
+        // Fetch requests when the page loads
+        $(document).ready(fetchFriendRequests);
+    </script>
+</body>
+</html>

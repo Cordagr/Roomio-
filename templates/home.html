@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        /* Success and error message styles */
+        .success {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            width: 80%;
+            text-align: center;
+        }
+
+        .error {
+            color: #c62828;
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            width: 80%;
+            text-align: center;
+        }
+
+        /* Navigation links styling */
+        .nav-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #000000;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #bbdefb;
+        }
+
+        /* Filter Form Styling */
+        .filter-form {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-form select, .filter-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .filter-form button {
+            background-color: #1e88e5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-form button:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Home Page</h1>
+
+    <!-- Registration success message -->
+    {% if registration_success %}
+        <div class="success">Registration successful! You can now log in.</div>
+    {% endif %}
+
+    <!-- Flash messages (success, error, etc.) -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Links -->
+    <div class="nav-links">
+        <a href="/displayAllProperties">Go to Property Management</a>
+        <a href="/userProfile">Manage Profile</a>
+        <a href="/userSettings">User Settings</a>
+        <a href="/userProfile/filterPage">Filter Users</a>
+        <a href="/api/friendRequestInbox"> User Friend Request Inbox</a>
+        <a href="{{ url_for('property.viewMyProperties') }}"> View My Posted Listings</a>
+    </div>
+
+    
+    <!-- Active Users Section -->
+    <div class="active-users">
+        <h2>Active Users</h2>
+        {% if active_users %}
+            <ul>
+                {% for user in active_users %}
+                    <li>
+                        <!-- User profile picture -->
+                        {% if user.get('profile_picture') %}
+                            <img src="{{ url_for('static', filename='profile_pictures/' + user['profile_picture']) }}" 
+                                 alt="{{ user['username'] }}'s profile picture" class="profile-pic">
+                        {% else %}
+                            <div class="placeholder"></div>
+                        {% endif %}
+                        
+                        <!-- User details -->
+                        <div class="user-details">
+                            <strong>
+                                <a href="{{ url_for('userProfile.showOtherProfile', username=user['username']) }}">
+                                    {{ user['username'] }}
+                                </a>
+                            </strong>
+                            {% if user.get('email') %}
+                                <p>{{ user['email'] }}</p>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No active users currently.</p>
+        {% endif %}
+    </div>
+
+    <!-- Logout Button -->
+    <form action="/logoutUser" method="POST">
+        <button class="logout-button" type="submit">Logout</button>
+    </form>
+
+</body>
+</html>
