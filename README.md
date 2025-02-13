@@ -1,3 +1,7 @@
+# Overview
+Roomio- is a web application designed to help University of North Texas (UNT) students find rooms and manage their accommodations efficiently. The application features user authentication, profile management, property listings.
+
+
 # Installation
 1. Clone the repository
 ``` Code
