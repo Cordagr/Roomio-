@@ -11,9 +11,6 @@ git clone https://github.com/Cordagr/Roomio-.git
 ``` Code
 cd Roomio-
 ```
-3. Install the required dependencies:
-``` Code
-pip install -r requirements.txt
 ```
 # Configuration
 1. Set up your environment variables for the database password and Flask secret key
